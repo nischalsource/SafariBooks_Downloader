@@ -1,5 +1,5 @@
 # SafariBooks_Downloader
-a bash shell script that uses a valid login cookie in Netscape format to download an entire book from http://safaribooksonline.com
+a linux shell script I wrote that uses a valid login cookie in Netscape format to download an entire book from http://safaribooksonline.com
 
 ##Usage:  
 --------  

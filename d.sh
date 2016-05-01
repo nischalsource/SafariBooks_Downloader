@@ -60,8 +60,10 @@ elif ${cookie+"false"}; then
 elif ${url+"false"}; then
    echo "Error: Please specify the complete URI to download in the following URI format:  protocol://domain/directory"
    exit;
+elif  [ ! -f $cookie ]; then
+   echo "Error: Please check the path to the specified Netscape cookie.txt file"
+   exit;
 fi
-
 
 domain="https://www.safaribooksonline.com"
 domainLength=${#domain}

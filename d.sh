@@ -65,6 +65,17 @@ elif  [ ! -f $cookie ]; then
    exit;
 fi
 
+#Check if Cookie is Valid
+count=$(wget -SO- --header='Host: www.safaribooksonline.com' --header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en-US,en;q=0.5' --header='Content-Type: application/x-www-form-urlencoded' --load-cookies /home/shiva/Documents/ebooks/downloads/cookies.txt https://www.safaribooksonline.com/home 2>&1 1>- | grep -c 'logged_in=y');
+
+if (($count >= 1)) ; then
+   echo "Cookie is valid. Login Successful!";
+else
+   printf "\nCookie is not valid.\n";
+   printf "Would you still like to continue? Y or N";
+fi
+
+
 domain="https://www.safaribooksonline.com"
 domainLength=${#domain}
 

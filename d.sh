@@ -91,23 +91,30 @@ echo "The includePath is: " $includePath
 mkdir $dir
 cd $dir
 
+
 #Main Download in a recursive way
+printf "\nBeginning Main Download\n"
+
 wget -nv -k -r --no-directories -I $includePath --header='Host: www.safaribooksonline.com' --header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en-US,en;q=0.5' --header='Content-Type: application/x-www-form-urlencoded' --load-cookies $cookie $url
 
+
 #Redownload all CSS
+printf "\nRedownloading and uncompressing all .css files\n"
 for file in *.css;
 do
 echo $file
-wget -O- --header='Accept-Encoding: gzip,deflate,br' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en-US,en;q=0.5' --header='Content-Type: application/x-www-form-urlencoded' https://www.safaribooksonline.com/static/CACHE/css/$file | gunzip > $file
+wget -nv -O- --header='Accept-Encoding: gzip,deflate,br' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en-US,en;q=0.5' --header='Content-Type: application/x-www-form-urlencoded' https://www.safaribooksonline.com/static/CACHE/css/$file | gunzip > $file
 done;
 
 #Replace xhtml file extension with html file extension
+printf "\nReplacing .xhtml extension with .html\n"
 for xhtmlFile in *.xhtml; 
 do 
 mv $xhtmlFile ${xhtmlFile: 0: $((${#xhtmlFile} -6))}.html; 
 done;
 
 #Replace  all in-file xhtml links with html links
+printf "\nReplacing all in-file .xhtml links with .html\n"
 for htmlFile in *.html
 do
 sed -i s/xhtml/html/g $htmlFile

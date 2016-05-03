@@ -11,7 +11,8 @@ a linux shell script I wrote that uses a valid login cookie in Netscape format t
      Specify the name of the directory this script must create from this level to download   
     -u | --url  
      Specify the complete URI to download in the following URI format:  protocol://domain/directory  
-     
+     -f | --file
+     Specify a txt file with one URI per line     
 
 ##Example
 ---------  

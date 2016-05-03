@@ -18,7 +18,7 @@ END
 
 
 #Begin
-clear;
+#clear;
 
 #Checks for Parameters
 printf "STEP 1: Check for Parameters\n\n"
@@ -45,12 +45,47 @@ do
             url=$2
 	    printf "The url value is:\t\t%s\n" $url
             shift 2 ;;
+        -f | --file)
+           file=$2
+           printf "The file value is:\t\t%s\n" $file
+           shift 2 ;;
+         -r | --recursive)
+           recursive=true
+           printf "The recursive value is:\t\t%s\n" $recursive
+	   shift 1 ;;
         -h | \? | --help)
             echoHelp
             exit
             ;;
     esac
 done
+
+#Check Required Parameters
+if [ -z $recursive]; then
+if [ -n $file ]; then
+  if [ -z $cookie ]; then
+   printf "Error: Please Specify the absolute filesystem location to the Netscape format cookie.txt file\n\n";
+   exit;
+  else
+    if [ -f $file ]; then
+     export file=$file;
+     while read
+      do
+       end=${REPLY##*/}
+       echo $end;
+       lastSlashPos=$((${#REPLY} - ${#end}))
+       dirNameLength=$(($lastSlashPos-47-1))
+       dir=${REPLY: 47: $dirNameLength};
+       ECHO $dir;
+       $bash ./d.sh --cookie $cookie --url $REPLY --dir $dir --recursive
+      done < "$file"
+    else
+     printf "Error: Cannot locate the file list you provided\n\n";
+     exit;
+    fi
+  fi
+fi 
+fi
 
 #Check Parameters have been successfully set
 if ${dir+"false"}; then

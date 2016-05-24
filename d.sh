@@ -85,7 +85,7 @@ printf "The includePath is:\t\t%s\n" $includePath
 #Check if Cookie is Valid
 printf "\nSTEP 2: Check login Cookie is Valid\n"
 
-count=$(wget -SO- --header='Host: www.safaribooksonline.com' --header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en-US,en;q=0.5' --header='Content-Type: application/x-www-form-urlencoded' --load-cookies /home/shiva/Documents/ebooks/downloads/cookies.txt https://www.safaribooksonline.com/home 2>&1 1>/dev/null | grep -c 'logged_in=y');
+count=$(wget -SO- --header='Host: www.safaribooksonline.com' --header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en-US,en;q=0.5' --header='Content-Type: application/x-www-form-urlencoded' --load-cookies $cookie https://www.safaribooksonline.com/home 2>&1 1>/dev/null | grep -c 'logged_in=y');
 
 if (($count >= 1)) ; then
    printf "Cookie is valid. Login Successful!\n";

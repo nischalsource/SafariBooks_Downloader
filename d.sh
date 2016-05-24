@@ -1,5 +1,18 @@
 #!/bin/bash
 
+#SET PRIVATE MEMBERS 1
+dir_separator="/"
+alternate="_alternate"
+domain="https://www.safaribooksonline.com"
+domainHome="https://www.safaribooksonline.com/home"
+domainLibraryView="https://www.safaribooksonline.com/library/view"$dir_separator
+domainStaticFilesLocation="/static"
+domainLength=${#domain}
+domainLibraryViewLength=${#domainLibraryView}
+
+
+
+
 #Prints out help on how to use this script
 function  echoHelp () {
 cat <<-END
@@ -8,22 +21,26 @@ Usage:
    -h | --help
      Display this help
    -c | --cookie
-     Add the absolute filesystem location to the Netscape format cookie.txt file
+     Specify the absolute filesystem location to the Netscape format cookie.txt file
    -d | --dir
      Specify the name of the directory this script must create from this level to download 
    -u | --url
      Specify the complete URI to download in the following URI format:  protocol://domain/directory
+   -f | --file
+     Specify the absolute filesystem location of a list of url's to download in the form of a .txt file 
 END
 }
 
 
 #Begin
-#clear;
+if [ -z $recursive]; then
+clear;
+fi
 
 #Checks for Parameters
 printf "STEP 1: Check for Parameters\n\n"
 if [ $# -eq 0 ]; then
-    printf "No arguments specified. Try -h for help"
+    printf "No arguments specified. Try -h for help\n\n"
     exit;
 fi
        
@@ -49,19 +66,19 @@ do
            file=$2
            printf "The file value is:\t\t%s\n" $file
            shift 2 ;;
-         -r | --recursive)
+        -r | --recursive)
            recursive=true
            printf "The recursive value is:\t\t%s\n" $recursive
 	   shift 1 ;;
         -h | \? | --help)
-            echoHelp
-            exit
-            ;;
+           echoHelp
+           exit;
     esac
 done
 
+
 #Check Required Parameters
-if [ -z $recursive]; then
+if [ -z $recursive ]; then
 if [ -n $file ]; then
   if [ -z $cookie ]; then
    printf "Error: Please Specify the absolute filesystem location to the Netscape format cookie.txt file\n\n";
@@ -71,13 +88,18 @@ if [ -n $file ]; then
      export file=$file;
      while read
       do
-       end=${REPLY##*/}
-       echo $end;
-       lastSlashPos=$((${#REPLY} - ${#end}))
-       dirNameLength=$(($lastSlashPos-47-1))
-       dir=${REPLY: 47: $dirNameLength};
-       ECHO $dir;
-       $bash ./d.sh --cookie $cookie --url $REPLY --dir $dir --recursive
+       if [ ${#REPLY} -ge 0 ]; then
+        #return everything after the last slash 
+        #http://landoflinux.com/linux_bash_scripting_substring_tests.html
+        ReplyWithoutSlash=${REPLY##*/}
+        #total url length minus length of everything after the last slash
+        lastSlashPos=$((${#REPLY} - ${#ReplyWithoutSlash}))
+        dirNameLength=$(($lastSlashPos - $domainLibraryViewLength))
+        dir=${REPLY: $domainLibraryViewLength: $dirNameLength};
+        $bash ./d.sh --cookie $cookie --url $REPLY --dir $dir --recursive
+       else
+        echo "There exist nothing at this line"
+       fi
       done < "$file"
     else
      printf "Error: Cannot locate the file list you provided\n\n";
@@ -104,36 +126,39 @@ fi
 
 
 
-# Set private members
-domain="https://www.safaribooksonline.com"
-domainLength=${#domain}
-dir_separator="/"
+# SET PRIVATE MEMBERS 2
 dirLength=$((${#dir} + ${#dir_separator}))
 includePath3=${url:$domainLength}
 includePath2=${includePath3%$dir_separator}
-includePath=${includePath2},/static
-printf "The includePath is:\t\t%s\n" $includePath
+includePath=${includePath2}$domainStaticFilesLocation
 
+printf "The includePath is:\t\t%s\n" $includePath
 
 
 
 #Check if Cookie is Valid
 printf "\nSTEP 2: Check login Cookie is Valid\n"
 
-count=$(wget -SO- --header='Host: www.safaribooksonline.com' --header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en-US,en;q=0.5' --header='Content-Type: application/x-www-form-urlencoded' --load-cookies /home/shiva/Documents/ebooks/downloads/cookies.txt https://www.safaribooksonline.com/home 2>&1 1>/dev/null | grep -c 'logged_in=y');
+count=$(wget -SO- --header='Host: www.safaribooksonline.com' --header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en-US,en;q=0.5' --header='Content-Type: application/x-www-form-urlencoded' --load-cookies $cookie $domainHome 2>&1 1>/dev/null | grep -c 'logged_in=y');
 
 if (($count >= 1)) ; then
    printf "Cookie is valid. Login Successful!\n";
 else
    printf "\nCookie is not valid.\n";
+   exit;
    printf "Would you still like to continue? Y or N";
 fi
 
 
 
 #Construct Container Directory
-mkdir $dir
-cd $dir
+if [ ! -d $dir ]; then
+  mkdir $dir
+  cd $dir
+else
+  mkdir $dir$alternate
+  cd $dir$alternate
+fi
 
 
 #Main Download in a recursive way

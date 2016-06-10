@@ -41,6 +41,7 @@ fi
 printf "STEP 1: Check for Parameters\n\n"
 if [ $# -eq 0 ]; then
     printf "No arguments specified. Try -h for help\n\n"
+    echoHelp
     exit;
 fi
        
